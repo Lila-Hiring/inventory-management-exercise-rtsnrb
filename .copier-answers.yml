@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v0.7.1
+_src_path: git@github.com:fl97inc/uv-fastapi-template.git
+author_email: ljunkert@lila.ai
+author_name: Levi Junkert
+github_team: DCP
+pip.conf: null
+port: 8080
+project_description: A FastAPI and React programming exercise
+project_name: inventory_management_exercise

@@ -1,0 +1,99 @@
+name: Build and Test
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+env:
+  PYTHON_VERSION: 3.12
+  UV_NO_SYNC: 1
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Build Wheel
+        run: |
+          uv build
+
+      - name: Attach Wheel
+        uses: actions/upload-artifact@v4
+        with:
+          path: dist/inventory_management_exercise-*.whl
+          name: inventory_management_exercise
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # required for coverage diff against main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Fetch Wheel
+        uses: actions/download-artifact@v4
+        with:
+          path: wheels/
+
+      - name: Install from Wheel
+        run: |
+          uv venv
+          uv pip install "inventory_management_exercise[dev]" wheels/inventory_management_exercise/inventory_management_exercise-*.whl
+
+      - name: Run tests with coverage
+        id: coverage
+        working-directory: ${{ github.workspace }}
+        run: |
+          make test
+          {
+            echo 'coverage_report<<EOF'
+            make -s coverage
+            echo EOF
+          } >> $GITHUB_OUTPUT
+          echo "coverage=$(uv run coverage report --format=total)" >> $GITHUB_OUTPUT
+
+      - name: Find existing coverage comment if it exists
+        id: existing_comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: 'Coverage Report'
+
+      - name: Post coverage badge comments
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          repository: ${{ github.repository }}
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.existing_comment.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            ## Coverage Report
+            ![Coverage](https://img.shields.io/badge/Coverage-${{ steps.coverage.outputs.coverage }}%25-brightgreen)
+            ```text
+            ${{ steps.coverage.outputs.coverage_report }}
+            ```

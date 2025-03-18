@@ -1,0 +1,24 @@
+name: Lint and Format
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  clean-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Run format
+        if: ${{ !cancelled() }}
+        uses: fl97inc/lila-actions/format@b744e519c23d7194a16fe126924582fba67dc03f  # v1.9.2
+
+      - name: Run lint
+        if: ${{ !cancelled() }}
+        uses: fl97inc/lila-actions/lint@b744e519c23d7194a16fe126924582fba67dc03f  # v1.9.2
