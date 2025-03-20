@@ -1,4 +1,4 @@
-.PHONY: lint-fix help install dev lint type-check test clean build-client login coverage
+.PHONY: lint-fix help install dev lint type-check test clean build-client login coverage migrate migrate-create
 
 help:  ## Display this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
@@ -52,3 +52,9 @@ build-client:  ## Generate OpenAPI client
 		-g typescript-fetch \
 		-o clients/typescript \
 		--additional-properties=supportsES6=true,npmName=inventory_management_exercise-client
+
+migrate:  ## Run database migrations
+	cd src && PYTHONPATH=.. uv run alembic upgrade head
+
+migrate-create:  ## Create a new migration
+	cd src && PYTHONPATH=.. uv run alembic revision --autogenerate -m "$(message)"
