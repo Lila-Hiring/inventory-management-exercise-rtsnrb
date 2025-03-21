@@ -1,11 +1,15 @@
 from fastapi import APIRouter
 from scalar_fastapi import get_scalar_api_reference
 
-from inventory_management_exercise.api.routes.v1._hello_world import hello_router
+from ._architectures import router as architectures_router
+from ._computers import router as computers_router
 
 # Router for all routes we want to expose under the `/v1` API path.
 v1_router = APIRouter(prefix="/v1")
-v1_router.include_router(hello_router)
+
+# Include the computers router
+v1_router.include_router(computers_router)
+v1_router.include_router(architectures_router)
 
 
 @v1_router.get("/docs", include_in_schema=False)

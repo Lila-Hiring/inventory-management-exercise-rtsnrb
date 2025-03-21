@@ -147,3 +147,6 @@ staticfiles/
 bandit_output.txt
 coverage.svg
 .DS_Store
+
+# Ignore SQLite
+inventory.db
