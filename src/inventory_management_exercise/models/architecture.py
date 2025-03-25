@@ -1,10 +1,11 @@
 from sqlmodel import Field, Relationship, SQLModel
 
+from .operating_system import OperatingSystem
+
 
 class Architecture(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    name: str  # e.g., "x86_64", "ARM64"
+    name: str
     description: str
-    # Example: "x86_64", "ARM64", etc.
-
-    operating_systems: list["OperatingSystem"] = Relationship()  # noqa: F821  # pyright: ignore[reportUndefinedVariable]
+    soft_deleted: bool = Field(default=False)
+    operating_systems: list["OperatingSystem"] = Relationship(back_populates="architecture")

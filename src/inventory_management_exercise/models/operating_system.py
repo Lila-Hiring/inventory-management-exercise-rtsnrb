@@ -12,6 +12,6 @@ class OperatingSystem(SQLModel, table=True):
     release_date: date | None = None
 
     architecture_id: int | None = Field(default=None, foreign_key="architecture.id")
-    architecture: Optional["Architecture"] = Relationship()  # noqa: F821  # pyright: ignore[reportUndefinedVariable]
+    architecture: Optional["Architecture"] = Relationship(back_populates="operating_systems")  # noqa: F821  # pyright: ignore[reportUndefinedVariable]
 
     computers: list["Computer"] = Relationship(back_populates="operating_system")  # noqa: F821  # pyright: ignore[reportUndefinedVariable]
