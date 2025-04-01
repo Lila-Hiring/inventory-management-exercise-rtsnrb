@@ -34,6 +34,7 @@ jobs:
         run: |
           uv venv
           uv sync
+          uv pip install .[dev]
           echo "PYTHONPATH=$GITHUB_WORKSPACE/.venv/lib/python${{ env.PYTHON_VERSION }}/site-packages" >> $GITHUB_ENV
           echo "$GITHUB_WORKSPACE/.venv/bin" >> $GITHUB_PATH
 

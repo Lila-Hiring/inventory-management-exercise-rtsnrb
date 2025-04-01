@@ -8,17 +8,55 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  PYTHON_VERSION: 3.13
+
 jobs:
-  clean-python:
+  format:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Run format
-        if: ${{ !cancelled() }}
-        uses: fl97inc/lila-actions/format@b744e519c23d7194a16fe126924582fba67dc03f  # v1.9.2
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Run lint
-        if: ${{ !cancelled() }}
-        uses: fl97inc/lila-actions/lint@b744e519c23d7194a16fe126924582fba67dc03f  # v1.9.2
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      - name: Register problem matcher
+        shell: bash
+        run: |
+          echo '{"problemMatcher":[{"owner":"ruff","pattern":[{"regexp":"^(Would reformat): (.+)$","message":1,"file":2}]}]}' > ${{ runner.temp }}/ruff.json
+          echo "::add-matcher::${{ runner.temp }}/ruff.json"
+
+      - name: Run ruff
+        shell: bash
+        run: |
+          ruff format --check
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      - name: Run ruff
+        shell: bash
+        run: |
+          ruff check --output-format=github
