@@ -4,6 +4,14 @@ A FastAPI and React programming exercise
 
 ## Development
 
+### Prerequisites
+
+Download and install uv: <https://docs.astral.sh/uv/getting-started/installation>
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
 ### Installation
 
 Install development dependencies:
@@ -31,4 +39,3 @@ uv run make lint
 # Run the development server
 uv run make dev
 ```
-
