@@ -2,6 +2,7 @@
 
 from fastapi import HTTPException
 from sqlmodel import select
+from sqlmodel.sql.expression import col
 
 
 def get_or_404(model, obj_id, session):
@@ -14,5 +15,5 @@ def get_or_404(model, obj_id, session):
 
 def list_not_soft_deleted(model, session):
     """List all non-soft-deleted objects of a model."""
-    statement = select(model).where(not model.soft_deleted)
+    statement = select(model).where(col(model.soft_deleted).is_(False))
     return session.exec(statement).all()

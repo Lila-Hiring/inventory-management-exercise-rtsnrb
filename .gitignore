@@ -150,3 +150,4 @@ coverage.svg
 
 # Ignore SQLite
 inventory.db
+src/inventory.db
